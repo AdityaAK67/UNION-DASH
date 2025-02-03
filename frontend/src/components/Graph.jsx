@@ -1,5 +1,5 @@
 import React from "react";
-import {BarChart,Bar,XAxis,YAxis,Tooltip,CartesianGrid,LineChart,Line,ResponsiveContainer,Legend,PieChart,Pie,Cell,AreaChart,Area} from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, LineChart, Line, ResponsiveContainer, Legend, PieChart, Pie, Cell, AreaChart, Area } from "recharts";
 
 export default function Graph({ domains }) {
     if (!domains || domains.length === 0)
@@ -31,14 +31,36 @@ export default function Graph({ domains }) {
                 <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={riskScoreData}>
                         <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="domain" tick={{ fill: "#fff" }} />
+                        <XAxis dataKey="domain" tick={false} /> {/* Hides website names */}
                         <YAxis tick={{ fill: "#fff" }} />
-                        <Tooltip />
+                        <Tooltip
+                            content={({ payload }) => {
+                                if (payload && payload.length) {
+                                    const { domain, risk_score } = payload[0].payload;
+                                    return (
+                                        <div className="bg-black p-2 rounded-md text-white">
+                                            <p><strong>Domain:</strong> <a href={`http://${domain}`} target="_blank" rel="noopener noreferrer" className="text-blue-400">{domain}</a></p>
+                                            <p><strong>Risk Score:</strong> {risk_score}</p>
+                                        </div>
+                                    );
+                                }
+                                return null;
+                            }}
+                        />
                         <Legend />
-                        <Bar dataKey="risk_score" fill="#FFEB00" animationDuration={1000} />
+                        <Bar dataKey="risk_score" animationDuration={1000}>
+                            {riskScoreData.map((entry, index) => {
+                                let color = entry.risk_score >= 75 ? "#FF5733" :
+                                    entry.risk_score >= 30 ? "#FFEB00" :
+                                        "#33FF57";
+                                return <Cell key={`cell-${index}`} fill={color} />;
+                            })}
+                        </Bar>
                     </BarChart>
                 </ResponsiveContainer>
             </div>
+
+
 
             {/* Line Chart */}
             <div className="bg-[#0b0f35] p-4 rounded-lg shadow-md">
@@ -62,7 +84,7 @@ export default function Graph({ domains }) {
                     </LineChart>
                 </ResponsiveContainer>
             </div>
-
+            
             {/* Pie Chart */}
             <div className="bg-[#0b0f35] p-4 rounded-lg shadow-md">
                 <h2 className="text-lg font-bold mb-3 text-center">Risk Score Distribution</h2>

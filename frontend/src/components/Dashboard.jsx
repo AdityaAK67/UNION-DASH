@@ -4,13 +4,14 @@ import { Plus, Search, User, Power, X, Bell, RefreshCw } from "lucide-react";
 import { motion } from "framer-motion";
 import Graph from "./Graph";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
   const [domains, setDomains] = useState([]);
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [newDomain, setNewDomain] = useState({ domain: "", risk_score: "", status: "Pending" });
-
+  const navigate = useNavigate(); // Initialize useNavigate
   const fetchDomains = () => {
     axios.get("http://localhost:5000/api/domains").then((res) => setDomains(res.data));
   };
@@ -45,7 +46,10 @@ export default function Dashboard() {
             <Bell className="text-white" size={22} />
             <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1">1</span>
           </button>
-          <button className="flex items-center hover:text-blue-500 transition duration-200 ease-in-out">
+          <button
+            className="flex items-center hover:text-blue-500 transition duration-200 ease-in-out text-white"
+            onClick={() => navigate("/login")}
+          >
             <User className="mr-2 text-white" size={20} />
             Login
           </button>
@@ -147,23 +151,33 @@ export default function Dashboard() {
             </tr>
           </thead>
           <tbody>
-            {domains.filter((d) => d.domain.includes(search)).map((d, index) => (
-              <motion.tr
-                key={index}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
-                className="hover:bg-slate-700 transition"
-              >
-                <td className="p-3 border-b">{d.domain}</td>
-                <td className="p-3 border-b">{d.risk_score}</td>
-                <td className="p-3 border-b flex items-center gap-2">
-                  <span className={`w-4 h-4 rounded-full ${d.status === "Pending" ? "bg-red-500" : d.status === "In Progress" ? "bg-yellow-500" : "bg-green-500"}`}></span>
-                  {d.status}
-                </td>
-              </motion.tr>
-            ))}
+            {domains.filter((d) => d.domain.includes(search)).map((d, index) => {
+              const riskScore = parseInt(d.risk_score, 10);
+              const riskColor =
+                riskScore >= 75 ? "bg-red-500" :
+                  riskScore >= 30 ? "bg-yellow-500" :
+                    "bg-green-500";
+
+              return (
+                <motion.tr
+                  key={index}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                  className="hover:bg-slate-700 transition"
+                >
+                  <td className="p-3 border-b">{d.domain}</td>
+                  <td className="p-3 border-b flex items-center gap-2">
+                    <span className={`w-4 h-4 rounded-full ${riskColor}`}></span>
+                    {d.risk_score}
+                  </td>
+                  <td className="p-3 border-b">{d.status}</td>
+                </motion.tr>
+              );
+            })}
           </tbody>
+
+
         </table>
       </div>
       <Graph domains={domains} />
