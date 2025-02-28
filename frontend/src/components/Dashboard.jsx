@@ -12,10 +12,11 @@ export default function Dashboard() {
   const [showForm, setShowForm] = useState(false);
   const [newDomain, setNewDomain] = useState({ domain: "", risk_score: "", status: "Pending" });
   const navigate = useNavigate(); // Initialize useNavigate
+   
   const fetchDomains = () => {
     axios.get("http://localhost:5000/api/domains").then((res) => setDomains(res.data));
   };
-
+  
   useEffect(() => {
     fetchDomains();
   }, []);
@@ -84,8 +85,7 @@ export default function Dashboard() {
 
         <button
           onClick={() => setShowForm(!showForm)}
-          className="flex items-center justify-center gap-2 px-6 py-3 bg-[#FFEB00] text-black rounded-md hover:bg-blue-600 transition w-full max-w-xs"
-        >
+          className="flex items-center justify-center gap-2 px-6 py-3 bg-[#FFEB00] text-black rounded-md hover:bg-blue-600 transition w-full max-w-xs">
           {showForm ? <X className="w-5 text-white" /> : <Plus className="w-5 text-white" />}
           <span className="text-sm font-semibold">Add Domain</span>
         </button>

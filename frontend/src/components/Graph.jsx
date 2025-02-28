@@ -10,7 +10,7 @@ export default function Graph({ domains }) {
         domain: d.domain,
         risk_score: parseInt(d.risk_score, 10),
     }));
-
+    
     const riskOverTime = domains.map((d, i) => ({
         time: `T${i + 1}`,
         risk_score: parseInt(d.risk_score, 10),
@@ -20,6 +20,9 @@ export default function Graph({ domains }) {
         name: d.domain,
         value: parseInt(d.risk_score, 10),
     }));
+
+    // Sort domains by _id in descending order (latest first)
+   const sortedDomains = [...domains].sort((a, b) => b._id.localeCompare(a._id));
 
     const COLORS = ["#FFEB00", "#FF5733", "#33FF57", "#339FFF", "#FF33A6"];
 
@@ -87,27 +90,28 @@ export default function Graph({ domains }) {
             
             {/* Pie Chart */}
             <div className="bg-[#0b0f35] p-4 rounded-lg shadow-md">
-                <h2 className="text-lg font-bold mb-3 text-center">Risk Score Distribution</h2>
-                <ResponsiveContainer width="100%" height={300}>
-                    <PieChart>
-                        <Pie
-                            data={pieData}
-                            cx="50%"
-                            cy="50%"
-                            outerRadius={100}
-                            fill="#FFEB00"
-                            dataKey="value"
-                            label
-                            animationDuration={1000}
-                        >
-                            {pieData.map((_, index) => (
-                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                            ))}
-                        </Pie>
-                        <Tooltip />
-                    </PieChart>
-                </ResponsiveContainer>
+            <h2 className="text-lg font-bold mb-3 text-center">Recently Added Domains</h2>
+            <div className="overflow-auto max-h-64">
+                <table className="w-full text-left border-collapse">
+                    <thead>
+                        <tr className="bg-gray-700 text-white">
+                            <th className="p-2">Domain</th>
+                            <th className="p-2">Risk Score</th>
+                            <th className="p-2">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {sortedDomains.map((domain) => (
+                            <tr key={domain._id} className="border-b border-gray-600 hover:bg-gray-800">
+                                <td className="p-2">{domain.domain}</td>
+                                <td className="p-2">{domain.risk_score}</td>
+                                <td className="p-2">{domain.status}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </div>
+        </div>
 
             {/* Area Chart */}
             <div className="bg-[#0b0f35] p-4 rounded-lg shadow-md">

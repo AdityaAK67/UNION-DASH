@@ -1,0 +1,17 @@
+[
+    {
+      "id": "1",
+      "domain": "fake-instagram.com",
+      "risk_score": 0,
+      "status": "completed",
+      "comment": "Detected as a phishing site."
+    },
+    {
+      "id": "2",
+      "domain": "secure-paypal.com",
+      "risk_score": 100,
+      "status": "completed",
+      "comment": "Further investigation needed."
+    }
+  ]
+  
